@@ -12,7 +12,6 @@ const partnerSchema = new mongoose.Schema({
   address: {
     type: String,
   },
-  disconts: [{ product: String, percentage: Number }],
   description: {
     type: String,
   },

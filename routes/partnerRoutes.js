@@ -3,9 +3,6 @@ const partnerController = require("./../controllers/partnerController");
 
 const router = express.Router();
 
-router.route("/:id/:productId").patch(partnerController.deleteProduct);
-router.route("/:id/").patch(partnerController.createProduct);
-
 router
   .route("/")
   .post(partnerController.createPartner)
