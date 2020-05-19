@@ -13,10 +13,6 @@ router
   .route("/:id")
   .get(partnerController.getPartner)
   .patch(partnerController.updatePartner)
-  .delete(
-    authController.protect,
-    authController.restrictToSubscriber(true),
-    partnerController.deletePartner
-  );
+  .delete(authController.protect, partnerController.deletePartner);
 
 module.exports = router;

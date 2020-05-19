@@ -15,7 +15,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail],
   },
-  subscription: Boolean,
+  subscription: {
+    type: Boolean,
+    default: false,
+  },
   photo: String,
   password: {
     type: String,
@@ -36,6 +39,45 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  discontCard: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Disconts",
+      required: [true, "Review must belong to a user"],
+    },
+  ],
+  favorite: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Partners",
+      required: [true, "Review must belong to a user"],
+    },
+  ],
+});
+
+/* userSchema.pre(/^findById/, function (next) {
+  this.populate({
+    path: "favorite",
+    select: "name category",
+  });
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "discontCard",
+    select: "name percentage",
+  });
+  next();
+}); */
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
 });
 
 userSchema.pre("save", function (next) {
