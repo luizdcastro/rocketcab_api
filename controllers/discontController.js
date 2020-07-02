@@ -11,7 +11,7 @@ exports.updateDiscont = factory.updateOne(Discont);
 exports.deleteDiscont = catchAsync(async (req, res, next) => {
   await Discont.findByIdAndDelete(req.params.id);
   await User.updateMany({
-    $pull: { discontCard: req.params.id },
+    $pull: { coupon: req.params.id },
     multi: true,
   });
 

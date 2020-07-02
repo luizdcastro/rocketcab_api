@@ -51,7 +51,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 
 exports.subiscribeMe = catchAsync(async (req, res, next) => {
-  const subscriberUser = await User.findByIdAndUpdate(
+  const subscription = await User.findByIdAndUpdate(
     req.user.id,
     { subscription: true },
     {
@@ -62,13 +62,33 @@ exports.subiscribeMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      user: subscriberUser,
+      status: 'subscription active',
     },
   });
 });
 
+exports.unsubscribeMe = catchAsync(async (req, res, next) => {
+  const subscription = await User.findByIdAndUpdate(
+    req.user.id,
+    { subscription: false },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      status: 'subscription inactive',
+    },
+  });
+});
+
+
+
 exports.createFavorite = catchAsync(async (req, res, next) => {
-  const favorite = await User.findByIdAndUpdate(req.params.id, {
+  if (!req.body.favorite) req.body.favorite = req.params.favoriteId
+  const favorite = await User.findByIdAndUpdate(req.user.id, {
     $addToSet: { favorite: req.body.favorite },
     new: true,
   });
@@ -82,7 +102,8 @@ exports.createFavorite = catchAsync(async (req, res, next) => {
 });
 
 exports.removeFavorite = catchAsync(async (req, res, next) => {
-  const favorite = await User.findByIdAndUpdate(req.params.id, {
+  if (!req.body.favorite) req.body.favorite = req.params.favoriteId
+  const favorite = await User.findByIdAndUpdate(req.user.id, {
     $pull: { favorite: { $in: req.body.favorite } },
     new: true,
   });
@@ -95,30 +116,32 @@ exports.removeFavorite = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createDiscontCard = catchAsync(async (req, res, next) => {
-  const discontCard = await User.findByIdAndUpdate(req.params.id, {
-    $addToSet: { discontCard: req.body.discontCard },
+exports.createCoupon = catchAsync(async (req, res, next) => {
+  if (!req.body.coupon) req.body.coupon = req.params.couponId
+  const coupon = await User.findByIdAndUpdate(req.params.id, {
+    $addToSet: { coupon: req.body.coupon },
     new: true,
   });
 
   res.status(200).json({
     status: "success",
     data: {
-      user: discontCard,
+      user: coupon,
     },
   });
 });
 
-exports.removeDiscontCard = catchAsync(async (req, res, next) => {
-  const discontCard = await User.findByIdAndUpdate(req.params.id, {
-    $pull: { discontCard: { $in: req.body.discontCard } },
+exports.removeCoupon = catchAsync(async (req, res, next) => {
+  if (!req.body.coupon) req.body.coupon = req.params.couponId
+  const coupon = await User.findByIdAndUpdate(req.params.id, {
+    $pull: { coupon: { $in: req.body.coupon } },
     new: true,
   });
 
   res.status(200).json({
     status: "success",
     data: {
-      user: discontCard,
+      user: coupon,
     },
   });
 });
@@ -136,15 +159,15 @@ exports.getMyFavorites = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getMyCards = catchAsync(async (req, res, next) => {
-  const myCards = await User.findById(req.user.id, {
-    discontCard: req.user.discontCard,
-  }).populate({ path: "discontCard", select: "name percentage" })
+exports.getMyCoupons = catchAsync(async (req, res, next) => {
+  const myCoupons = await User.findById(req.user.id, {
+    coupon: req.user.coupon,
+  }).populate({ path: "coupon", select: "name" })
 
   res.status(200).json({
     status: "success",
     data: {
-      myCards
+      myCoupons
     }
   })
 });

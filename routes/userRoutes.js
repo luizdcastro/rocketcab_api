@@ -1,64 +1,96 @@
-const express = require("express");
-const factory = require("./../controllers/handlerFactory");
-const userController = require("./../controllers/userController");
-const authController = require("./../controllers/authController");
+const express = require('express');
+const userController = require('./../controllers/userController');
+const authController = require('./../controllers/authController');
+const partnerController = require('./../controllers/partnerController');
 
 const router = express.Router();
 
 // User Authentication
-router.post("/signup", authController.signup);
-router.post("/login", authController.login);
-router.post("/forgotPassword", authController.forgotPassword);
-router.patch("/resetPassword/:token", authController.resetPassword);
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
 
 // User profile Update
 router.patch(
-  "/updateMyPassword",
+  '/updateMyPassword',
   authController.protect,
   authController.updatePassword
 );
-router.patch("/updateMe", authController.protect, userController.updateMe);
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+router.patch('/updateMe', authController.protect, userController.updateMe);
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
 
 // Get me
 router.get(
-  "/me",
+  '/me',
   authController.protect,
   userController.getMe,
   userController.getUser
 );
 router.get(
-  "/myFavorites",
+  '/myFavorites',
   authController.protect,
   userController.getMe,
   userController.getMyFavorites
 );
 
-router.get("/myCards",
+router.get(
+  '/myCoupons',
   authController.protect,
   userController.getMe,
-  userController.getMyCards
-)
+  userController.getMyCoupons
+);
 
 // User subscription
 router.patch(
-  "/subscribeMe",
+  '/subscribeMe',
   authController.protect,
   userController.subiscribeMe
 );
 
-// User Favorite
-router.route("/addFavorite/:id").patch(userController.createFavorite);
-router.route("/delFavorite/:id").patch(userController.removeFavorite);
+router.patch(
+  '/unsubscribeMe',
+  authController.protect,
+  userController.unsubscribeMe
+);
 
-// Use discont cards
-router.route("/addCard/:id").patch(userController.createDiscontCard);
-router.route("/delCard/:id").patch(userController.removeDiscontCard);
-
-router.route("/").get(userController.getAllusers);
-
+// User Favorites
 router
-  .route("/:id")
+  .route('/addFavorite/:favoriteId')
+  .patch(
+    authController.protect,
+    userController.getMe,
+    userController.createFavorite
+  );
+router
+  .route('/removeFavorite/:favoriteId')
+  .patch(
+    authController.protect,
+    userController.getMe,
+    userController.removeFavorite
+  );
+
+// Use Coupons
+router
+  .route('/addCoupon/:couponId')
+  .patch(
+    authController.protect,
+    userController.getMe,
+    userController.createCoupon
+  );
+router
+  .route('/removeCoupon/:couponId')
+  .patch(
+    authController.protect,
+    userController.getMe,
+    userController.removeCoupon
+  );
+
+router.route('/').get(userController.getAllusers);
+
+// Admin
+router
+  .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
