@@ -5,6 +5,8 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
 const crypto = require('crypto');
+var request = require('request');
+const dotenv = require('dotenv');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -44,6 +46,25 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+  });
+
+  const options = {
+    method: 'POST',
+    url: 'https://api.iugu.com/v1/customers',
+    body: { name: req.body.name, email: req.body.email },
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      authorization: process.env.IUGO_BASIC_AUTH,
+    },
+  };
+
+  request(options, async function (error, response, body) {
+    if (error) throw new Error(error);
+    const iugoId = await body.id;
+    await User.findByIdAndUpdate(newUser._id, {
+      iugoId: iugoId,
+    });
   });
 
   createSendToken(newUser, 201, res);

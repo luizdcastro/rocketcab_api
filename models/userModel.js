@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail],
     },
+    iugoId: {
+      type: String,
+    },
     subscription: {
       type: Boolean,
       default: false,
