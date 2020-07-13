@@ -54,6 +54,12 @@ router.patch(
   userController.unsubscribeMe
 );
 
+router.patch(
+  '/createToken',
+  authController.protect,
+  userController.createPayment
+);
+
 // User Favorites
 router
   .route('/addFavorite/:favoriteId')

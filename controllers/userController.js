@@ -2,6 +2,8 @@ const User = require('./../models/userModel');
 const factoty = require('./../controllers/handlerFactory');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+var request = require('request');
+const dotenv = require('dotenv');
 
 exports.getAllusers = factoty.getAll(User);
 exports.updateUser = factoty.updateOne(User);
@@ -165,5 +167,49 @@ exports.getMyCoupons = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: coupons,
+  });
+});
+
+exports.createPayment = catchAsync(async (req, res, next) => {
+  const data = await {
+    number: req.body.number,
+    code: req.body.code,
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    month: req.body.month,
+    year: req.body.year,
+  };
+
+  const options = {
+    method: 'POST',
+    url: 'https://api.iugu.com/v1/payment_token',
+    body: {
+      account_id: 'A4A963C54F4F46F9A9ECE117B335BD3D',
+      method: 'credit_card',
+      test: false,
+      data: {
+        number: data.number,
+        verification_value: data.code,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        month: data.month,
+        year: data.year,
+      },
+    },
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      authorization: process.env.IUGO_BASIC_AUTH,
+    },
+  };
+
+  request(options, async function (error, response, body) {
+    if (error) throw new Error(error);
+
+    console.log(body);
+  });
+
+  res.status(200).json({
+    status: 'success',
   });
 });
