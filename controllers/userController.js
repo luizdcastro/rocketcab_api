@@ -256,30 +256,36 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
 exports.createSubscription = catchAsync(async (req, res, next) => {
   const user_data = await User.findById(req.user.id);
 
-  const options = {
-    method: 'POST',
-    url: 'https://api.iugu.com/v1/subscriptions',
-    body: {
-      plan_identifier: 'basic_plan',
-      customer_id: user_data.iugu_id,
-      only_on_charge_success: true,
-      payable_with: 'credit_card',
-    },
-    json: true,
-    headers: {
-      'content-type': 'application/json',
-      authorization: process.env.IUGO_BASIC_AUTH,
-    },
-  };
-  request(options, async function (error, response, body) {
-    if (error) throw new Error(error);
-    console.log(body);
-    const subscription = await body.id;
-    await User.findByIdAndUpdate(req.user.id, {
-      iugu_subscription: subscription,
+  if (user_data.subscription === false) {
+    const options = {
+      method: 'POST',
+      url: 'https://api.iugu.com/v1/subscriptions',
+      body: {
+        plan_identifier: 'basic_plan',
+        customer_id: user_data.iugu_id,
+        only_on_charge_success: true,
+        payable_with: 'credit_card',
+      },
+      json: true,
+      headers: {
+        'content-type': 'application/json',
+        authorization: process.env.IUGO_BASIC_AUTH,
+      },
+    };
+
+    request(options, async function (error, response, body) {
+      if (error) throw new Error(error);
+      console.log(body);
+      const subscription = await body.id;
+      await User.findByIdAndUpdate(req.user.id, {
+        iugu_subscription: subscription,
+        subscription: true,
+      });
     });
-  });
-  res.status(200).json({
-    status: 'success',
-  });
+    res.status(200).json({
+      status: 'success',
+    });
+  } else {
+    console.log('Usuário já possui uma assinatura ativa');
+  }
 });
