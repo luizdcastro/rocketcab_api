@@ -29,7 +29,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     return next(new AppError('This route is not for password update!', 400));
   }
 
-  const filterBody = filterObj(req.body, 'name', 'email');
+  const filterBody = filterObj(
+    req.body,
+    'name',
+    'email',
+    'iugu_id',
+    'iugu_card_data',
+    'iugu_payment_method'
+  );
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
     new: true,
     runValidators: true,
@@ -170,7 +177,7 @@ exports.getMyCoupons = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createPayment = catchAsync(async (req, res, next) => {
+exports.createPaymentServer = catchAsync(async (req, res, next) => {
   const data = await {
     number: req.body.number,
     code: req.body.code,
@@ -186,7 +193,7 @@ exports.createPayment = catchAsync(async (req, res, next) => {
     body: {
       account_id: 'A4A963C54F4F46F9A9ECE117B335BD3D',
       method: 'credit_card',
-      test: false,
+      test: true,
       data: {
         number: data.number,
         verification_value: data.code,
@@ -209,6 +216,36 @@ exports.createPayment = catchAsync(async (req, res, next) => {
     console.log(body);
   });
 
+  res.status(200).json({
+    status: 'success',
+  });
+});
+
+exports.createPaymentMethod = catchAsync(async (req, res, next) => {
+  const user_data = await User.findById(req.user.id);
+  const token = await user_data.iugu_card_data.id;
+  const iuguId = await user_data.iugu_id;
+  const options = {
+    method: 'POST',
+    url: `https://api.iugu.com/v1/customers/${iuguId}/payment_methods`,
+    body: {
+      description: 'Meu Cartão de Crédito',
+      set_as_default: true,
+      token: token,
+    },
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      authorization: process.env.IUGO_BASIC_AUTH,
+    },
+  };
+  request(options, async function (error, response, body) {
+    const token = await body.id;
+    console.log(`token: ${token}`);
+    await User.findByIdAndUpdate(req.user.id, {
+      iugu_payment_method: token,
+    });
+  });
   res.status(200).json({
     status: 'success',
   });

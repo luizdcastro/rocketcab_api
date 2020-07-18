@@ -57,7 +57,13 @@ router.patch(
 router.patch(
   '/createToken',
   authController.protect,
-  userController.createPayment
+  userController.createPaymentServer
+);
+
+router.post(
+  '/createPaymentMethod',
+  authController.protect,
+  userController.createPaymentMethod
 );
 
 // User Favorites

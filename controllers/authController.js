@@ -63,7 +63,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     if (error) throw new Error(error);
     const iugoId = await body.id;
     await User.findByIdAndUpdate(newUser._id, {
-      iugoId: iugoId,
+      iugu_id: iugoId,
     });
   });
 

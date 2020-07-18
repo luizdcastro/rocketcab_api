@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const { strict } = require('assert');
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,8 +17,14 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail],
     },
-    iugoId: {
+    iugu_id: {
       type: String,
+    },
+    iugu_payment_method: {
+      type: String,
+    },
+    iugu_card_data: {
+      type: Object,
     },
     subscription: {
       type: Boolean,
