@@ -66,6 +66,12 @@ router.post(
   userController.createPaymentMethod
 );
 
+router.post(
+  '/createSubscription',
+  authController.protect,
+  userController.createSubscription
+);
+
 // User Favorites
 router
   .route('/addFavorite/:favoriteId')

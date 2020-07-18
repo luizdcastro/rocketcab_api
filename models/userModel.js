@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema(
     iugu_card_data: {
       type: Object,
     },
+    iugu_subscription: {
+      type: String,
+    },
     subscription: {
       type: Boolean,
       default: false,
