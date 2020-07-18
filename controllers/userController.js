@@ -275,7 +275,6 @@ exports.createSubscription = catchAsync(async (req, res, next) => {
 
     request(options, async function (error, response, body) {
       if (error) throw new Error(error);
-      console.log(body);
       const subscription = await body.id;
       await User.findByIdAndUpdate(req.user.id, {
         iugu_subscription: subscription,
@@ -287,5 +286,34 @@ exports.createSubscription = catchAsync(async (req, res, next) => {
     });
   } else {
     console.log('Usuário já possui uma assinatura ativa');
+  }
+});
+
+exports.cancelSubscription = catchAsync(async (req, res, next) => {
+  const user_data = await User.findById(req.user.id);
+
+  if (user_data.subscription === true) {
+    const options = {
+      method: 'POST',
+      url: `https://api.iugu.com/v1/subscriptions/${user_data.iugu_subscription}`,
+      json: true,
+      headers: {
+        'content-type': 'application/json',
+        authorization: process.env.IUGO_BASIC_AUTH,
+      },
+    };
+
+    request(options, async function (error, response, body) {
+      if (error) throw new Error(error);
+      await User.findByIdAndUpdate(req.user.id, {
+        iugu_subscription: '',
+        subscription: false,
+      });
+    });
+    res.status(200).json({
+      status: 'success',
+    });
+  } else {
+    console.log('Usuário mão possui assinatura ativa');
   }
 });

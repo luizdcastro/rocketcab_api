@@ -72,6 +72,12 @@ router.post(
   userController.createSubscription
 );
 
+router.post(
+  '/cancelSubscription',
+  authController.protect,
+  userController.cancelSubscription
+);
+
 // User Favorites
 router
   .route('/addFavorite/:favoriteId')
