@@ -1,14 +1,14 @@
-const Partner = require("./../models/partnerModel");
-const User = require("./../models/userModel");
-const Discont = require("./../models/discontModel");
-const factory = require("./handlerFactory");
-const catchAsync = require("./../utils/catchAsync");
+const Partner = require('./../models/partnerModel');
+const User = require('./../models/userModel');
+const Discont = require('./../models/discontModel');
+const factory = require('./handlerFactory');
+const catchAsync = require('./../utils/catchAsync');
 
 exports.createPartner = factory.createOne(Partner);
 exports.getAllPartners = factory.getAll(Partner);
 exports.getPartner = factory.getOne(Partner, {
-  path: "discont",
-  select: "name percentage",
+  path: 'discont',
+  select: 'name percentage days time rules',
 });
 exports.updatePartner = factory.updateOne(Partner);
 
@@ -23,7 +23,7 @@ exports.deletePartner = catchAsync(async (req, res, next) => {
   });
 
   res.status(201).json({
-    status: "success",
+    status: 'success',
     data: null,
   });
 });

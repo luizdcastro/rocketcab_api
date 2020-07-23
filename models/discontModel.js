@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Partner = require("./partnerModel");
+const mongoose = require('mongoose');
+const Partner = require('./partnerModel');
 
 const discontSchema = new mongoose.Schema(
   {
@@ -12,10 +12,19 @@ const discontSchema = new mongoose.Schema(
     partner: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "Partners",
-        required: [true, "Review must belong to a user"],
+        ref: 'Partners',
+        required: [true, 'Review must belong to a user'],
       },
     ],
+    time: {
+      type: String,
+    },
+    days: {
+      type: String,
+    },
+    rules: {
+      type: Array,
+    },
   },
   {
     toObject: { virtuals: true },
@@ -23,10 +32,10 @@ const discontSchema = new mongoose.Schema(
   }
 );
 
-discontSchema.pre("findByIdAndDelete", function (next) {
+discontSchema.pre('findByIdAndDelete', function (next) {
   var discont = this;
   discont
-    .model("Cards")
+    .model('Cards')
     .update(
       { discont: { $in: discont.cards } },
       { $pull: { card: card._id } },
@@ -35,6 +44,6 @@ discontSchema.pre("findByIdAndDelete", function (next) {
     );
 });
 
-const Discont = mongoose.model("Disconts", discontSchema);
+const Discont = mongoose.model('Disconts', discontSchema);
 
 module.exports = Discont;

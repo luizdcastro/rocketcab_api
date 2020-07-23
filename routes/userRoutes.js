@@ -66,6 +66,12 @@ router.post(
   userController.createPaymentMethod
 );
 
+router.patch(
+  '/removePaymentMethod',
+  authController.protect,
+  userController.removePaymentMethod
+);
+
 router.post(
   '/createSubscription',
   authController.protect,

@@ -317,3 +317,14 @@ exports.cancelSubscription = catchAsync(async (req, res, next) => {
     console.log('Usuário mão possui assinatura ativa');
   }
 });
+
+exports.removePaymentMethod = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.body.id, {
+    $unset: { iugu_card_data: {}, iugu_payment_method: '' },
+    new: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+  });
+});

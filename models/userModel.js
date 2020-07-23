@@ -85,7 +85,7 @@ userSchema.pre(/^find/, function (next) {
   }),
     this.populate({
       path: 'coupon',
-      select: 'name percentage',
+      select: 'name percentage days time',
       populate: {
         path: 'partner',
         select: 'name category',
