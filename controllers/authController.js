@@ -139,7 +139,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://https://rocketcab-server.herokuapp.com/reset-passwordd/${resetToken}`;
+  const resetURL = `${req.protocol}://https://rocketcab.herokuapp.com/reset-passwordd/${resetToken}`;
 
   const message = `Forgot your password? Submit your a PATCH request with your new password and passwordConfirm to ${resetURL}.\nIf you did not forget your password, please ignore this email`;
 
