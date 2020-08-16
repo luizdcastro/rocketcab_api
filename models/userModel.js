@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    passwordResetLink: {
+      data: String,
+      default: '',
+    },
     coupon: [
       {
         type: mongoose.Schema.ObjectId,
