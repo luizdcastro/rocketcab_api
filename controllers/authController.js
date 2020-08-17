@@ -197,10 +197,24 @@ exports.updatePassword = async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
-    return next(new AppError('Your current password is wrong', 400));
+    return next(new AppError('A senha atual está incorreta.', 400));
   }
+
+  if (req.body.password !== req.body.passwordConfirm) {
+    return next(new AppError('A confirmação da senha está incorreta.', 400));
+  }
+
+  if (!req.body.password || !req.body.passwordConfirm) {
+    return next(new AppError('Faltando preencher senha ou confirmação.', 400));
+  }
+
+  if (req.body.password.length < 6) {
+    return next(new AppError('A senha deve ter no mínimo 6 digitos.', 400));
+  }
+
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
+
   await user.save();
 
   createSendToken(user, 200, res);
