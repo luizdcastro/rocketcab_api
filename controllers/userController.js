@@ -38,17 +38,21 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     'iugu_payment_method',
     'iugu_subscription'
   );
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
-    new: true,
-    runValidators: true,
-  });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user: updatedUser,
-    },
-  });
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (err) {
+    next(new AppError('Informe seu nome ou email antes de salvar.', err), 400);
+  }
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
