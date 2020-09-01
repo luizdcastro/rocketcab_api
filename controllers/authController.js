@@ -21,11 +21,11 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    Ssecure: true,
+    secure: true,
     httpOnly: true,
   };
 
-  if (process.env.NODE_ENV === 'PRODUCTION') cookieOptions.secure = true;
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
   res.cookie('jwt', token, cookieOptions);
 
@@ -41,7 +41,26 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
+  const { name, email, password, passwordConfirm } = req.body;
+
+  if (!name || !email) {
+    next(new AppError('Por favor, informe seu nome e email.', 400));
+  }
+
+  if (password !== passwordConfirm) {
+    return next(new AppError('A confirmação da senha está incorreta.', 400));
+  }
+
+  if (password.length < 6) {
+    return next(new AppError('A senha deve ter no mínimo 6 digitos.', 400));
+  }
+
+  const userEmail = await User.findOne({ email: req.body.email });
+  if (userEmail) {
+    return next(new AppError(`O email ${email} já está cadastrado.`));
+  }
+
+  const user = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
@@ -62,24 +81,24 @@ exports.signup = catchAsync(async (req, res, next) => {
   request(options, async function (error, response, body) {
     if (error) throw new Error(error);
     const iugoId = await body.id;
-    await User.findByIdAndUpdate(newUser._id, {
+    await User.findByIdAndUpdate(user._id, {
       iugu_id: iugoId,
     });
   });
 
-  createSendToken(newUser, 201, res);
+  createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    next(new AppError('Please provide email and password', 400));
+    next(new AppError('Por favor, entre com seu email e senha', 400));
   }
 
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    next(new AppError('Incorrect email or password', 401));
+    next(new AppError('Senha ou email incorreto', 401));
   }
 
   createSendToken(user, 200, res);
