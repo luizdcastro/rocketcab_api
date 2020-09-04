@@ -16,6 +16,13 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail],
     },
+    phone: {
+      type: String,
+    },
+    isPartner: {
+      type: Boolean,
+      default: false,
+    },
     iugu_id: {
       type: String,
     },

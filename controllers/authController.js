@@ -6,7 +6,6 @@ const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
 const crypto = require('crypto');
 var request = require('request');
-const dotenv = require('dotenv');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -41,7 +40,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm } = req.body;
+  const { name, email, password, passwordConfirm, isPartner } = req.body;
 
   if (!name || !email) {
     next(new AppError('Por favor, informe seu nome e email.', 400));
@@ -63,28 +62,34 @@ exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.create({
     name: req.body.name,
     email: req.body.email,
+    phone: req.body.phone,
+    isPartner: req.body.isPartner,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const options = {
-    method: 'POST',
-    url: 'https://api.iugu.com/v1/customers',
-    body: { name: req.body.name, email: req.body.email },
-    json: true,
-    headers: {
-      'content-type': 'application/json',
-      authorization: process.env.IUGO_BASIC_AUTH,
-    },
-  };
+  await User.findById(user._id);
 
-  request(options, async function (error, response, body) {
-    if (error) throw new Error(error);
-    const iugoId = await body.id;
-    await User.findByIdAndUpdate(user._id, {
-      iugu_id: iugoId,
+  if (user.isPartner == false) {
+    const options = {
+      method: 'POST',
+      url: 'https://api.iugu.com/v1/customers',
+      body: { name: req.body.name, email: req.body.email },
+      json: true,
+      headers: {
+        'content-type': 'application/json',
+        authorization: process.env.IUGO_BASIC_AUTH,
+      },
+    };
+
+    request(options, async function (error, response, body) {
+      if (error) throw new Error(error);
+      const iugoId = await body.id;
+      await User.findByIdAndUpdate(user._id, {
+        iugu_id: iugoId,
+      });
     });
-  });
+  }
 
   createSendToken(user, 201, res);
 });
