@@ -71,14 +71,14 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.ObjectId,
         ref: 'Disconts',
-        required: [true, 'Review must belong to a user'],
+        required: true,
       },
     ],
     favorite: [
       {
         type: mongoose.Schema.ObjectId,
         ref: 'Partners',
-        required: [true, 'Review must belong to a user'],
+        required: true,
       },
     ],
   },

@@ -8,11 +8,12 @@ const hpp = require('hpp');
 const partnerRouter = require('./routes/partnerRoutes');
 const userRouter = require('./routes/userRoutes');
 const discontRouter = require('./routes/discontRoutes');
+const filesRouter = require('./routes/filesRoute');
 const mongoSanitize = require('express-mongo-sanitize');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-
 app.set('view engine', 'pug');
 
 // Global middlewares
@@ -20,7 +21,7 @@ app.set('view engine', 'pug');
 app.use(helmet());
 app.use(cors());
 
-// Development logging
+// Development loggin
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -39,7 +40,14 @@ app.use(express.json({ limit: '1kb' }));
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
+// Static data
+app.use(
+  '/files',
+  express.static(path.resolve(__dirname, '.', 'tmp', 'uploads'))
+);
+
 // Data sanitizations agains XSS
+app.use(xss());
 app.use(xss());
 
 // Prevent parameter pollution
@@ -53,6 +61,7 @@ app.use(
 app.use('/api/v1/partners', partnerRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/disconts', discontRouter);
+app.use('/api/v1/files', filesRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

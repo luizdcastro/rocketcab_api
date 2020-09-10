@@ -1,14 +1,15 @@
+const User = require('./userModel');
 const mongoose = require('mongoose');
 
 const partnerSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'The partner must have a name'],
+      required: true,
     },
     category: {
       type: String,
-      required: [true, 'The partner must have a category'],
+      required: true,
     },
     address: {
       type: String,
@@ -34,13 +35,17 @@ const partnerSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Users',
+      required: true,
+    },
   },
   {
     toObject: { virtuals: true },
     toJSON: { virtuals: true },
   }
 );
-
 partnerSchema.virtual('discont', {
   ref: 'Disconts',
   foreignField: 'partner',
