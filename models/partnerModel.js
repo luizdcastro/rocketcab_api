@@ -12,7 +12,7 @@ const partnerSchema = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: String,
+      type: Object,
     },
     phone: {
       type: String,
@@ -23,11 +23,8 @@ const partnerSchema = new mongoose.Schema(
     website: {
       type: String,
     },
-    open_at: {
-      type: String,
-    },
-    close_at: {
-      type: String,
+    hours: {
+      type: Object,
     },
     description: {
       type: String,
