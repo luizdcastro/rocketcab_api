@@ -7,7 +7,7 @@ const discontSchema = new mongoose.Schema(
       type: String,
     },
     percentage: {
-      type: Number,
+      type: String,
     },
     partner: [
       {
