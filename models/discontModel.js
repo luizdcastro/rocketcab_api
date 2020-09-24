@@ -20,10 +20,10 @@ const discontSchema = new mongoose.Schema(
       type: String,
     },
     days: {
-      type: String,
-    },
-    rules: {
       type: Array,
+    },
+    description: {
+      type: String,
     },
   },
   {
