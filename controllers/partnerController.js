@@ -8,7 +8,7 @@ exports.createPartner = factory.createOne(Partner);
 exports.getAllPartners = factory.getAll(Partner);
 exports.getPartner = factory.getOne(Partner, {
   path: 'discont',
-  select: 'name percentage days time rules',
+  select: 'name percentage days time description',
 });
 exports.updatePartner = factory.updateOne(Partner);
 
