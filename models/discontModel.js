@@ -17,7 +17,7 @@ const discontSchema = new mongoose.Schema(
       },
     ],
     time: {
-      type: String,
+      type: Object,
     },
     days: {
       type: Array,
