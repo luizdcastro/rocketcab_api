@@ -244,10 +244,10 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
       authorization: process.env.IUGO_BASIC_AUTH,
     },
   };
-  request(options, async function (error, response, body) {
+  request(options, async function (error, response) {
     if (error) throw new Error(error);
-    if (body) {
-      const token_payment = await body.id;
+    if (response) {
+      const token_payment = await response.body.id;
       await User.findByIdAndUpdate(req.user.id, {
         iugu_payment_method: token_payment,
       });
