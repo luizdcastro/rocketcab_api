@@ -217,8 +217,6 @@ exports.createPaymentServer = catchAsync(async (req, res, next) => {
 
   request(options, async function (error, response, body) {
     if (error) throw new Error(error);
-
-    console.log(body);
   });
 
   res.status(200).json({
@@ -227,8 +225,11 @@ exports.createPaymentServer = catchAsync(async (req, res, next) => {
 });
 
 exports.createPaymentMethod = catchAsync(async (req, res, next) => {
+  const data = await {
+    id: req.body.id,
+    token: req.body.token,
+  };
   const user_data = await User.findById(req.user.id);
-  const token = await user_data.iugu_card_data.id;
   const iuguId = await user_data.iugu_id;
   const options = {
     method: 'POST',
@@ -236,7 +237,7 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
     body: {
       description: 'Meu Cartão de Crédito',
       set_as_default: true,
-      token: token,
+      token: data.token,
     },
     json: true,
     headers: {
@@ -244,13 +245,14 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
       authorization: process.env.IUGO_BASIC_AUTH,
     },
   };
-  request(options, async (function (error, response) {
+  request(options, async function (error, body, response) {
     if (error) throw new Error(error);
-    const token_payment = await response.body.id;
+    const token = await response.id;
+    console.log(token);
     await User.findByIdAndUpdate(req.user.id, {
-      iugu_payment_method: token_payment,
+      iugu_payment_method: token,
     });
-  }));
+  });
   res.status(200).json({
     status: 'success',
   });
@@ -294,31 +296,28 @@ exports.createSubscription = catchAsync(async (req, res, next) => {
 
 exports.cancelSubscription = catchAsync(async (req, res, next) => {
   const user_data = await User.findById(req.user.id);
+  const subscription = await user_data.iugu_subscription;
 
-  if (user_data.subscription === true) {
-    const options = {
-      method: 'POST',
-      url: `https://api.iugu.com/v1/subscriptions/${user_data.iugu_subscription}`,
-      json: true,
-      headers: {
-        'content-type': 'application/json',
-        authorization: process.env.IUGO_BASIC_AUTH,
-      },
-    };
+  const options = {
+    method: 'DELETE',
+    url: `https://api.iugu.com/v1/subscriptions/${subscription}`,
+    json: true,
+    headers: {
+      'content-type': 'application/json',
+      authorization: process.env.IUGO_BASIC_AUTH,
+    },
+  };
 
-    request(options, async function (error, response, body) {
-      if (error) throw new Error(error);
-      await User.findByIdAndUpdate(req.user.id, {
-        iugu_subscription: '',
-        subscription: false,
-      });
+  request(options, async function (error, response, body) {
+    if (error) throw new Error(error);
+    await User.findByIdAndUpdate(req.user.id, {
+      subscription: false,
+      iugu_subscription: '',
     });
-    res.status(200).json({
-      status: 'success',
-    });
-  } else {
-    console.log('Usuário mão possui assinatura ativa');
-  }
+  });
+  res.status(200).json({
+    status: 'success',
+  });
 });
 
 exports.removePaymentMethod = catchAsync(async (req, res, next) => {
