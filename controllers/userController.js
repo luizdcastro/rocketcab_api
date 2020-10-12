@@ -33,6 +33,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     req.body,
     'name',
     'email',
+    'phone',
     'iugu_id',
     'iugu_card_data',
     'iugu_payment_method',
