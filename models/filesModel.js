@@ -27,7 +27,7 @@ filesSchema.pre('remove', function () {
   if (process.env.STORAGE_TYPE === 's3') {
     return s3
       .deleteObject({
-        Bucket: 'rocketcab',
+        Bucket: 'rocketcab-images',
         Key: this.key,
       })
       .promise();

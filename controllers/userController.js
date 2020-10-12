@@ -248,7 +248,6 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
   request(options, async function (error, body, response) {
     if (error) throw new Error(error);
     const token = await response.id;
-    console.log(token);
     await User.findByIdAndUpdate(req.user.id, {
       iugu_payment_method: token,
     });
