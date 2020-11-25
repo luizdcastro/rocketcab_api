@@ -1,38 +1,27 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema(
   {
+    cpf: {
+      type: String,
+      required: [true, "Por favor, informe seu CPF"],
+      unique: true,
+    },
     name: {
       type: String,
-      required: [true, 'Please tell us your name'],
+      required: [true, "Por favor, informe seu nome"],
+    },
+    birthdayDate: {
+      type: String,
     },
     email: {
       type: String,
       required: [true, 'Please provide your email'],
-      unique: true,
       lowercase: true,
-      validate: [validator.isEmail],
     },
     phone: {
-      type: String,
-    },
-    isPartner: {
-      type: Boolean,
-      default: false,
-    },
-    iugu_id: {
-      type: String,
-    },
-    iugu_payment_method: {
-      type: String,
-    },
-    iugu_card_data: {
-      type: Object,
-    },
-    iugu_subscription: {
       type: String,
     },
     subscription: {
@@ -49,12 +38,6 @@ const userSchema = new mongoose.Schema(
     passwordConfirm: {
       type: String,
       required: [true, 'Please provide a password'],
-      validate: {
-        validator: function (el) {
-          return el === this.password;
-        },
-        message: 'Passwords are not the same!',
-      },
     },
     passwordChangedAt: Date,
     passwordResetToken: String,

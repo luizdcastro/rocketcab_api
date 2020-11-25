@@ -12,6 +12,8 @@ const filesRouter = require('./routes/filesRoute');
 const mongoSanitize = require('express-mongo-sanitize');
 const cors = require('cors');
 const path = require('path');
+const AppError = require('./utils/appError');
+
 
 const app = express();
 app.set('view engine', 'pug');

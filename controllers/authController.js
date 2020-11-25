@@ -5,7 +5,6 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
 const crypto = require('crypto');
-var request = require('request');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -60,7 +59,9 @@ exports.signup = catchAsync(async (req, res, next) => {
   }
 
   const user = await User.create({
+    cpf: req.body.cpf,
     name: req.body.name,
+    birthdayDate: req.body.date,
     email: req.body.email,
     phone: req.body.phone,
     isPartner: req.body.isPartner,
@@ -70,40 +71,19 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   await User.findById(user._id);
 
-  if (user.isPartner == false) {
-    const options = {
-      method: 'POST',
-      url: 'https://api.iugu.com/v1/customers',
-      body: { name: req.body.name, email: req.body.email },
-      json: true,
-      headers: {
-        'content-type': 'application/json',
-        authorization: process.env.IUGO_BASIC_AUTH,
-      },
-    };
-
-    request(options, async function (error, response, body) {
-      if (error) throw new Error(error);
-      const iugoId = await body.id;
-      await User.findByIdAndUpdate(user._id, {
-        iugu_id: iugoId,
-      });
-    });
-  }
-
   createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    next(new AppError('Por favor, entre com seu email e senha', 400));
+  const { cpf, password } = req.body;
+  if (!cpf || !password) {
+    next(new AppError('Por favor, entre com seu cpf e senha', 400));
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ cpf }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    next(new AppError('Senha ou email incorreto', 401));
+    next(new AppError('Senha ou cpf incorreto', 401));
   }
 
   createSendToken(user, 200, res);
@@ -155,9 +135,9 @@ exports.restrictToSubscriber = (...subscription) => {
 };
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ cpf: req.body.cpf });
   if (!user) {
-    return next(new AppError('There is no user with email address'));
+    return next(new AppError('There is no user with this cpf'));
   }
 
   const resetToken = user.createPasswordResetToken();
