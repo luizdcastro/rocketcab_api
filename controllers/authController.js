@@ -39,7 +39,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm, isPartner } = req.body;
+  const { cpf, name, email, phone, password, passwordConfirm, isPartner } = req.body;
 
   if (!name || !email) {
     next(new AppError('Por favor, informe seu nome e email.', 400));
@@ -56,7 +56,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const userCpf = await User.findOne({ cpf: req.body.cpf });
 
   if (userCpf) {
-    return next(new AppError(`O CPF ${userCpf} já está cadastrado.`));
+    return next(new AppError(`O CPF ${cpf} já está cadastrado.`));
   }
 
   const userEmail = await User.findOne({ email: req.body.email });
