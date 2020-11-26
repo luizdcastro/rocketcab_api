@@ -53,7 +53,14 @@ exports.signup = catchAsync(async (req, res, next) => {
     return next(new AppError('A senha deve ter no mínimo 6 digitos.', 400));
   }
 
+  const userCpf = await User.findOne({ cpf: req.body.cpf });
+
+  if (userCpf) {
+    return next(new AppError(`O CPF ${userCpf} já está cadastrado.`));
+  }
+
   const userEmail = await User.findOne({ email: req.body.email });
+
   if (userEmail) {
     return next(new AppError(`O email ${email} já está cadastrado.`));
   }
@@ -83,7 +90,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ cpf }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    next(new AppError('Senha ou cpf incorreto', 401));
+    next(new AppError('Seu cpf ou senha estão incorretos', 401));
   }
 
   createSendToken(user, 200, res);
